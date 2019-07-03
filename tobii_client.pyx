@@ -16,6 +16,7 @@ __version__ = f'{tobii_version.major}.{tobii_version.minor}.{tobii_version.revis
 
 GazePoint = namedtuple('GazePoint', 'timestamp, valid, x, y')
 
+
 cdef class TobiiAPI:
     cdef object thread_handle
     cdef bint stop_requested
@@ -34,8 +35,19 @@ cdef class TobiiAPI:
             self.p_device = tobii_client.c_connect_device(self.p_api, &self.api_data)
         else:
             self.p_device = NULL
+        self.api_data.gaze_callback = &self.gaze_callback
         self.stop_requested = False
         self.stopped = False
+    
+    cdef void gaze_callback(tobii_gaze_point_t* gaze_point, void* user_data):
+        # Store the latest gaze point data in the supplied storage
+        cdef tobii_gaze_point_t* ud
+        ud = <tobii_gaze_point_t*>user_data
+        ud.timestamp_us = gaze_point.timestamp_us
+        ud.validity = gaze_point.validity
+        ud.position_xy[0] = gaze_point.position_xy[0]
+        ud.position_xy[1] = gaze_point.position_xy[1]
+        print(gaze_point.position_xy[0], gaze_point.position_xy[1])
     
     def start_stream(self):
         retval = subscribe(self.p_api, self.p_device, &self.api_data)

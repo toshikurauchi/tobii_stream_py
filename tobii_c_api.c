@@ -1,14 +1,6 @@
 #include "tobii_c_api.h"
 
 
-static void gaze_callback( tobii_gaze_point_t const* gaze_point, void* user_data )
-{
-    // Store the latest gaze point data in the supplied storage
-    tobii_gaze_point_t* gaze_point_storage = (tobii_gaze_point_t*) user_data;
-    *gaze_point_storage = *gaze_point;
-}
-
-
 static void url_receiver( char const* url, void* user_data )
 {
     // The memory context is passed through the user_data void pointer
@@ -194,7 +186,7 @@ tobii_device_t* c_connect_device(tobii_api_t* api, struct c_api_data_t* api_data
 int subscribe( tobii_api_t* api, tobii_device_t* device, struct c_api_data_t* data )
 {
     // Start subscribing to gaze point data, in this sample we supply a tobii_gaze_point_t variable to store latest value.
-    tobii_error_t error = tobii_gaze_point_subscribe( device, gaze_callback, &data->latest_gaze_point );
+    tobii_error_t error = tobii_gaze_point_subscribe( device, data->gaze_callback, &data->latest_gaze_point );
     if( error != TOBII_ERROR_NO_ERROR )
     {
         fprintf( stderr, "Failed to subscribe to gaze stream.\n" );

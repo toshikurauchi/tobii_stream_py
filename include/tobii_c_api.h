@@ -13,13 +13,12 @@
 #define KILL_TIMEOUT 1000
 
 
-static void gaze_callback( tobii_gaze_point_t const* gaze_point, void* user_data );
-
 struct c_api_data_t
 {
     CRITICAL_SECTION log_mutex;
     tobii_custom_log_t custom_log;
     tobii_gaze_point_t latest_gaze_point;
+    void (*gaze_callback)( tobii_gaze_point_t const* gaze_point, void* user_data );
 };
 
 struct url_receiver_context_t

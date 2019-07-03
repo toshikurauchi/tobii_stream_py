@@ -53,6 +53,8 @@ cdef extern from "tobii/tobii_streams.h":
         tobii_validity_t validity
         float position_xy[ 2 ]
 
+ctypedef void (*gaze_callback_func)(tobii_gaze_point_t* gaze_point, void* user_data)
+
 cdef extern from "tobii_c_api.h":
     struct url_receiver_context_t:
         char** urls
@@ -65,6 +67,7 @@ cdef extern from "tobii_c_api.h":
 
     struct c_api_data_t:
         tobii_gaze_point_t latest_gaze_point
+        gaze_callback_func gaze_callback
 
     struct thread_context_t:
         pass
