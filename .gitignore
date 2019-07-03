@@ -1,0 +1,4 @@
+tobii_stream_engine.lib
+tobii_stream_engine.dll
+include/tobii
+build
