@@ -1731,7 +1731,7 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_4stop_stream(struct __pyx_obj
  *         self.stop_requested = True
  *         while not self.stopped:             # <<<<<<<<<<<<<<
  *             time.sleep(0.1)
- * 
+ *         cleanup(self.p_api, self.p_device, &self.api_data, &self.gaze_thread_context)
  */
   while (1) {
     __pyx_t_1 = ((!(__pyx_v_self->stopped != 0)) != 0);
@@ -1741,8 +1741,8 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_4stop_stream(struct __pyx_obj
  *         self.stop_requested = True
  *         while not self.stopped:
  *             time.sleep(0.1)             # <<<<<<<<<<<<<<
+ *         cleanup(self.p_api, self.p_device, &self.api_data, &self.gaze_thread_context)
  * 
- *     def gaze_loop_thread(self):
  */
     __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_time); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 59, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
@@ -1767,6 +1767,15 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_4stop_stream(struct __pyx_obj
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
 
+  /* "tobii_client.pyx":60
+ *         while not self.stopped:
+ *             time.sleep(0.1)
+ *         cleanup(self.p_api, self.p_device, &self.api_data, &self.gaze_thread_context)             # <<<<<<<<<<<<<<
+ * 
+ *     def gaze_loop_thread(self):
+ */
+  cleanup(__pyx_v_self->p_api, __pyx_v_self->p_device, (&__pyx_v_self->api_data), (&__pyx_v_self->gaze_thread_context));
+
   /* "tobii_client.pyx":56
  *         self.thread_handle.start()
  * 
@@ -1790,8 +1799,8 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_4stop_stream(struct __pyx_obj
   return __pyx_r;
 }
 
-/* "tobii_client.pyx":61
- *             time.sleep(0.1)
+/* "tobii_client.pyx":62
+ *         cleanup(self.p_api, self.p_device, &self.api_data, &self.gaze_thread_context)
  * 
  *     def gaze_loop_thread(self):             # <<<<<<<<<<<<<<
  *         while not self.stop_requested:
@@ -1820,7 +1829,7 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_6gaze_loop_thread(struct __py
   PyObject *__pyx_t_4 = NULL;
   __Pyx_RefNannySetupContext("gaze_loop_thread", 0);
 
-  /* "tobii_client.pyx":62
+  /* "tobii_client.pyx":63
  * 
  *     def gaze_loop_thread(self):
  *         while not self.stop_requested:             # <<<<<<<<<<<<<<
@@ -1831,7 +1840,7 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_6gaze_loop_thread(struct __py
     __pyx_t_1 = ((!(__pyx_v_self->stop_requested != 0)) != 0);
     if (!__pyx_t_1) break;
 
-    /* "tobii_client.pyx":63
+    /* "tobii_client.pyx":64
  *     def gaze_loop_thread(self):
  *         while not self.stop_requested:
  *             update_data(self.p_device, &self.gaze_thread_context)             # <<<<<<<<<<<<<<
@@ -1840,16 +1849,16 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_6gaze_loop_thread(struct __py
  */
     (void)(update_data(__pyx_v_self->p_device, (&__pyx_v_self->gaze_thread_context)));
 
-    /* "tobii_client.pyx":64
+    /* "tobii_client.pyx":65
  *         while not self.stop_requested:
  *             update_data(self.p_device, &self.gaze_thread_context)
  *             time.sleep(0.1)             # <<<<<<<<<<<<<<
  *         self.stopped = True
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_time); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 64, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_time); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 65, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_sleep); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 64, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_sleep); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 65, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_3 = NULL;
@@ -1864,13 +1873,13 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_6gaze_loop_thread(struct __py
     }
     __pyx_t_2 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_3, __pyx_float_0_1) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_float_0_1);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 64, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 65, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
 
-  /* "tobii_client.pyx":65
+  /* "tobii_client.pyx":66
  *             update_data(self.p_device, &self.gaze_thread_context)
  *             time.sleep(0.1)
  *         self.stopped = True             # <<<<<<<<<<<<<<
@@ -1879,8 +1888,8 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_6gaze_loop_thread(struct __py
  */
   __pyx_v_self->stopped = 1;
 
-  /* "tobii_client.pyx":61
- *             time.sleep(0.1)
+  /* "tobii_client.pyx":62
+ *         cleanup(self.p_api, self.p_device, &self.api_data, &self.gaze_thread_context)
  * 
  *     def gaze_loop_thread(self):             # <<<<<<<<<<<<<<
  *         while not self.stop_requested:
@@ -1902,7 +1911,7 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_6gaze_loop_thread(struct __py
   return __pyx_r;
 }
 
-/* "tobii_client.pyx":67
+/* "tobii_client.pyx":68
  *         self.stopped = True
  * 
  *     def __enter__(self):             # <<<<<<<<<<<<<<
@@ -1931,14 +1940,14 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_8__enter__(struct __pyx_obj_1
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__enter__", 0);
 
-  /* "tobii_client.pyx":68
+  /* "tobii_client.pyx":69
  * 
  *     def __enter__(self):
  *         self.start_stream()             # <<<<<<<<<<<<<<
  *         return self
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_start_stream); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 68, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_start_stream); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 69, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -1952,12 +1961,12 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_8__enter__(struct __pyx_obj_1
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 68, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 69, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "tobii_client.pyx":69
+  /* "tobii_client.pyx":70
  *     def __enter__(self):
  *         self.start_stream()
  *         return self             # <<<<<<<<<<<<<<
@@ -1969,7 +1978,7 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_8__enter__(struct __pyx_obj_1
   __pyx_r = ((PyObject *)__pyx_v_self);
   goto __pyx_L0;
 
-  /* "tobii_client.pyx":67
+  /* "tobii_client.pyx":68
  *         self.stopped = True
  * 
  *     def __enter__(self):             # <<<<<<<<<<<<<<
@@ -1990,7 +1999,7 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_8__enter__(struct __pyx_obj_1
   return __pyx_r;
 }
 
-/* "tobii_client.pyx":71
+/* "tobii_client.pyx":72
  *         return self
  * 
  *     def __exit__(self, type, value, traceback):             # <<<<<<<<<<<<<<
@@ -2032,17 +2041,17 @@ static PyObject *__pyx_pw_12tobii_client_8TobiiAPI_11__exit__(PyObject *__pyx_v_
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_value)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, 1); __PYX_ERR(0, 71, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, 1); __PYX_ERR(0, 72, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_traceback)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, 2); __PYX_ERR(0, 71, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, 2); __PYX_ERR(0, 72, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__exit__") < 0)) __PYX_ERR(0, 71, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__exit__") < 0)) __PYX_ERR(0, 72, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -2057,7 +2066,7 @@ static PyObject *__pyx_pw_12tobii_client_8TobiiAPI_11__exit__(PyObject *__pyx_v_
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 71, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 72, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("tobii_client.TobiiAPI.__exit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2078,14 +2087,14 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_10__exit__(struct __pyx_obj_1
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__exit__", 0);
 
-  /* "tobii_client.pyx":72
+  /* "tobii_client.pyx":73
  * 
  *     def __exit__(self, type, value, traceback):
  *         self.stop_stream()             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_stop_stream); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 72, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_stop_stream); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 73, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -2099,12 +2108,12 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_10__exit__(struct __pyx_obj_1
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 72, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 73, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "tobii_client.pyx":71
+  /* "tobii_client.pyx":72
  *         return self
  * 
  *     def __exit__(self, type, value, traceback):             # <<<<<<<<<<<<<<
@@ -2127,7 +2136,7 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_10__exit__(struct __pyx_obj_1
   return __pyx_r;
 }
 
-/* "tobii_client.pyx":75
+/* "tobii_client.pyx":76
  * 
  *     @property
  *     def latest_gaze_point(self):             # <<<<<<<<<<<<<<
@@ -2164,7 +2173,7 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_17latest_gaze_point___get__(s
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "tobii_client.pyx":76
+  /* "tobii_client.pyx":77
  *     @property
  *     def latest_gaze_point(self):
  *         timestamp = self.api_data.latest_gaze_point.timestamp_us             # <<<<<<<<<<<<<<
@@ -2174,50 +2183,50 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_17latest_gaze_point___get__(s
   __pyx_t_1 = __pyx_v_self->api_data.latest_gaze_point.timestamp_us;
   __pyx_v_timestamp = __pyx_t_1;
 
-  /* "tobii_client.pyx":77
+  /* "tobii_client.pyx":78
  *     def latest_gaze_point(self):
  *         timestamp = self.api_data.latest_gaze_point.timestamp_us
  *         valid = self.api_data.latest_gaze_point.validity == tobii_client.TOBII_VALIDITY_VALID             # <<<<<<<<<<<<<<
  *         x = self.api_data.latest_gaze_point.position_xy[0]
  *         y = self.api_data.latest_gaze_point.position_xy[1]
  */
-  __pyx_t_2 = __Pyx_PyBool_FromLong((__pyx_v_self->api_data.latest_gaze_point.validity == TOBII_VALIDITY_VALID)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 77, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyBool_FromLong((__pyx_v_self->api_data.latest_gaze_point.validity == TOBII_VALIDITY_VALID)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 78, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_valid = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "tobii_client.pyx":78
+  /* "tobii_client.pyx":79
  *         timestamp = self.api_data.latest_gaze_point.timestamp_us
  *         valid = self.api_data.latest_gaze_point.validity == tobii_client.TOBII_VALIDITY_VALID
  *         x = self.api_data.latest_gaze_point.position_xy[0]             # <<<<<<<<<<<<<<
  *         y = self.api_data.latest_gaze_point.position_xy[1]
  *         return GazePoint(timestamp, valid, x, y)
  */
-  __pyx_t_2 = PyFloat_FromDouble((__pyx_v_self->api_data.latest_gaze_point.position_xy[0])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_t_2 = PyFloat_FromDouble((__pyx_v_self->api_data.latest_gaze_point.position_xy[0])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 79, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_x = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "tobii_client.pyx":79
+  /* "tobii_client.pyx":80
  *         valid = self.api_data.latest_gaze_point.validity == tobii_client.TOBII_VALIDITY_VALID
  *         x = self.api_data.latest_gaze_point.position_xy[0]
  *         y = self.api_data.latest_gaze_point.position_xy[1]             # <<<<<<<<<<<<<<
  *         return GazePoint(timestamp, valid, x, y)
  */
-  __pyx_t_2 = PyFloat_FromDouble((__pyx_v_self->api_data.latest_gaze_point.position_xy[1])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __pyx_t_2 = PyFloat_FromDouble((__pyx_v_self->api_data.latest_gaze_point.position_xy[1])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 80, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_y = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "tobii_client.pyx":80
+  /* "tobii_client.pyx":81
  *         x = self.api_data.latest_gaze_point.position_xy[0]
  *         y = self.api_data.latest_gaze_point.position_xy[1]
  *         return GazePoint(timestamp, valid, x, y)             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GazePoint); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 80, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GazePoint); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 81, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyInt_From_int64_t(__pyx_v_timestamp); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 80, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_int64_t(__pyx_v_timestamp); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 81, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = NULL;
   __pyx_t_6 = 0;
@@ -2234,7 +2243,7 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_17latest_gaze_point___get__(s
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_3)) {
     PyObject *__pyx_temp[5] = {__pyx_t_5, __pyx_t_4, __pyx_v_valid, __pyx_v_x, __pyx_v_y};
-    __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 80, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 81, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -2243,14 +2252,14 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_17latest_gaze_point___get__(s
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
     PyObject *__pyx_temp[5] = {__pyx_t_5, __pyx_t_4, __pyx_v_valid, __pyx_v_x, __pyx_v_y};
-    __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 80, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 81, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   } else
   #endif
   {
-    __pyx_t_7 = PyTuple_New(4+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 80, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(4+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 81, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     if (__pyx_t_5) {
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -2267,7 +2276,7 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_17latest_gaze_point___get__(s
     __Pyx_GIVEREF(__pyx_v_y);
     PyTuple_SET_ITEM(__pyx_t_7, 3+__pyx_t_6, __pyx_v_y);
     __pyx_t_4 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 80, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 81, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
@@ -2276,7 +2285,7 @@ static PyObject *__pyx_pf_12tobii_client_8TobiiAPI_17latest_gaze_point___get__(s
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "tobii_client.pyx":75
+  /* "tobii_client.pyx":76
  * 
  *     @property
  *     def latest_gaze_point(self):             # <<<<<<<<<<<<<<

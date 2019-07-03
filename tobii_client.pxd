@@ -80,4 +80,4 @@ cdef extern from "tobii_c_api.h":
     int start_reconnect_and_timesync_thread(tobii_api_t* api, tobii_device_t* device, c_api_data_t* data, thread_context_t* thread_context);
     int schedule_timesync(tobii_api_t* api, tobii_device_t* device, c_api_data_t* data, thread_context_t* thread_context);
     int update_data( tobii_device_t* device, thread_context_t* thread_context );
-    int collect_gaze(c_api_data_t* data, thread_context_t* context);
+    void cleanup(tobii_api_t* api, tobii_device_t* device, c_api_data_t* data, thread_context_t* thread_context);

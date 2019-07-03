@@ -57,6 +57,7 @@ cdef class TobiiAPI:
         self.stop_requested = True
         while not self.stopped:
             time.sleep(0.1)
+        cleanup(self.p_api, self.p_device, &self.api_data, &self.gaze_thread_context)
     
     def gaze_loop_thread(self):
         while not self.stop_requested:

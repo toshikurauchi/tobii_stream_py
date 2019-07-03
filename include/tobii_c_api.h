@@ -10,6 +10,8 @@
 #include <windows.h>
 #pragma warning( pop )
 
+#define KILL_TIMEOUT 1000
+
 
 static void gaze_callback( tobii_gaze_point_t const* gaze_point, void* user_data );
 
@@ -69,4 +71,4 @@ int schedule_timesync( tobii_api_t* api, tobii_device_t* device, struct c_api_da
 
 int update_data( tobii_device_t* device, struct thread_context_t* thread_context );
 
-int collect_gaze( struct c_api_data_t* data, struct thread_context_t* context );
+void cleanup( tobii_api_t* api, tobii_device_t* device, struct c_api_data_t* data, struct thread_context_t* thread_context );

@@ -6,3 +6,4 @@ with tobii.TobiiAPI() as api:
     for i in range(10):
         time.sleep(0.2)
         print(api.latest_gaze_point)
+        
