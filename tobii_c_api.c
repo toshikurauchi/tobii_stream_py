@@ -191,7 +191,105 @@ tobii_device_t* c_connect_device(tobii_api_t* api, struct c_api_data_t* api_data
     return device;
 }
 
-int collect_gaze( struct thread_context_t* context )
+int subscribe( tobii_api_t* api, tobii_device_t* device, struct c_api_data_t* data )
+{
+    // Start subscribing to gaze point data, in this sample we supply a tobii_gaze_point_t variable to store latest value.
+    tobii_error_t error = tobii_gaze_point_subscribe( device, gaze_callback, &data->latest_gaze_point );
+    if( error != TOBII_ERROR_NO_ERROR )
+    {
+        fprintf( stderr, "Failed to subscribe to gaze stream.\n" );
+
+        tobii_device_destroy( device );
+        tobii_api_destroy( api );
+        DeleteCriticalSection( &data->log_mutex );
+        return 1;
+    }
+    return 0;
+}
+
+int setup_thread_context( tobii_api_t* api, tobii_device_t* device, struct c_api_data_t* data, struct thread_context_t* thread_context )
+{
+    // Create event objects used for inter thread signaling
+    HANDLE reconnect_event = CreateEvent( NULL, FALSE, FALSE, NULL );
+    HANDLE timesync_event = CreateWaitableTimer( NULL, TRUE, NULL );
+    HANDLE exit_event = CreateEvent( NULL, FALSE, FALSE, NULL );
+    if( reconnect_event == NULL || timesync_event == NULL || exit_event == NULL )
+    {
+        fprintf( stderr, "Failed to create event objects.\n" );
+
+        tobii_device_destroy( device );
+        tobii_api_destroy( api );
+        DeleteCriticalSection( &data->log_mutex );
+        return 1;
+    }
+
+    thread_context->device = device;
+    thread_context->reconnect_event = reconnect_event;
+    thread_context->timesync_event = timesync_event;
+    thread_context->exit_event = exit_event;
+    thread_context->is_reconnecting = 0;
+    return 0;
+}
+
+int start_reconnect_and_timesync_thread( tobii_api_t* api, tobii_device_t* device, struct c_api_data_t* data, struct thread_context_t* thread_context )
+{
+    // Create and run the reconnect and timesync thread
+    thread_context->reconnect_and_timesync_thread_handle = CreateThread( NULL, 0U, reconnect_and_timesync_thread, &thread_context, 0U, NULL );
+    if( thread_context->reconnect_and_timesync_thread_handle == NULL )
+    {
+        fprintf( stderr, "Failed to create reconnect_and_timesync thread.\n" );
+
+        tobii_device_destroy( device );
+        tobii_api_destroy( api );
+        DeleteCriticalSection( &data->log_mutex );
+        return 1;
+    }
+    return 0;
+}
+
+int schedule_timesync( tobii_api_t* api, tobii_device_t* device, struct c_api_data_t* data, struct thread_context_t* thread_context )
+{
+    LARGE_INTEGER due_time;
+    LONGLONG const timesync_update_interval = 300000000LL; // time sync every 30 s
+    due_time.QuadPart = -timesync_update_interval;
+    // Schedule the time synchronization event
+    BOOL timer_error = SetWaitableTimer( thread_context->timesync_event, &due_time, 0, NULL, NULL, FALSE );
+    if( timer_error == FALSE )
+    {
+        fprintf( stderr, "Failed to schedule timer event.\n" );
+
+        tobii_device_destroy( device );
+        tobii_api_destroy( api );
+        DeleteCriticalSection( &data->log_mutex );
+        return 1;
+    }
+    return 0;
+}
+
+int update_data( tobii_device_t* device, struct thread_context_t* thread_context )
+{
+    if( InterlockedCompareExchange( &thread_context->is_reconnecting, 0L, 0L ) )
+    {
+        return 1;
+    }
+    tobii_error_t error = tobii_device_process_callbacks( device );
+
+    if( error == TOBII_ERROR_CONNECTION_FAILED )
+    {
+        // Change state and signal that reconnect is needed.
+        InterlockedExchange( &thread_context->is_reconnecting, 1L );
+        SetEvent( thread_context->reconnect_event );
+    }
+    else if( error != TOBII_ERROR_NO_ERROR )
+    {
+        fprintf( stderr, "tobii_device_process_callbacks failed: %s.\n", tobii_error_message( error ) );
+        return 1;
+    }
+
+    return 0;
+}
+
+int collect_gaze( struct c_api_data_t* data, struct thread_context_t* thread_context )
 {
     // Initialize critical section, used for thread synchronization in the log function
     static CRITICAL_SECTION log_mutex;
@@ -230,14 +328,12 @@ int collect_gaze( struct thread_context_t* context )
         return 1;
     }
     
-    tobii_gaze_point_t latest_gaze_point;
-    latest_gaze_point.timestamp_us = 0LL;
-    latest_gaze_point.validity = TOBII_VALIDITY_INVALID;
-    // DONE UNTIL HERE!!!
-
+    // tobii_gaze_point_t latest_gaze_point;
+    data->latest_gaze_point.timestamp_us = 0LL;
+    data->latest_gaze_point.validity = TOBII_VALIDITY_INVALID;
 
     // Start subscribing to gaze point data, in this sample we supply a tobii_gaze_point_t variable to store latest value.
-    error = tobii_gaze_point_subscribe( device, gaze_callback, &latest_gaze_point );
+    error = tobii_gaze_point_subscribe( device, gaze_callback, &data->latest_gaze_point );
     if( error != TOBII_ERROR_NO_ERROR )
     {
         fprintf( stderr, "Failed to subscribe to gaze stream.\n" );
@@ -247,7 +343,7 @@ int collect_gaze( struct thread_context_t* context )
         DeleteCriticalSection( &log_mutex );
         return 1;
     }
-
+    
     // Create event objects used for inter thread signaling
     HANDLE reconnect_event = CreateEvent( NULL, FALSE, FALSE, NULL );
     HANDLE timesync_event = CreateWaitableTimer( NULL, TRUE, NULL );
@@ -262,12 +358,11 @@ int collect_gaze( struct thread_context_t* context )
         return 1;
     }
 
-    struct thread_context_t thread_context;
-    thread_context.device = device;
-    thread_context.reconnect_event = reconnect_event;
-    thread_context.timesync_event = timesync_event;
-    thread_context.exit_event = exit_event;
-    thread_context.is_reconnecting = 0;
+    thread_context->device = device;
+    thread_context->reconnect_event = reconnect_event;
+    thread_context->timesync_event = timesync_event;
+    thread_context->exit_event = exit_event;
+    thread_context->is_reconnecting = 0;
 
     // Create and run the reconnect and timesync thread
     HANDLE thread_handle = CreateThread( NULL, 0U, reconnect_and_timesync_thread, &thread_context, 0U, NULL );
@@ -280,12 +375,12 @@ int collect_gaze( struct thread_context_t* context )
         DeleteCriticalSection( &log_mutex );
         return 1;
     }
-
+    
     LARGE_INTEGER due_time;
     LONGLONG const timesync_update_interval = 300000000LL; // time sync every 30 s
     due_time.QuadPart = -timesync_update_interval;
     // Schedule the time synchronization event
-    BOOL timer_error = SetWaitableTimer( thread_context.timesync_event, &due_time, 0, NULL, NULL, FALSE );
+    BOOL timer_error = SetWaitableTimer( thread_context->timesync_event, &due_time, 0, NULL, NULL, FALSE );
     if( timer_error == FALSE )
     {
         fprintf( stderr, "Failed to schedule timer event.\n" );
@@ -295,24 +390,26 @@ int collect_gaze( struct thread_context_t* context )
         DeleteCriticalSection( &log_mutex );
         return 1;
     }
+    
+    // TODO FROM HERE
 
     // Main loop
     int i = 0;
-    while( i < 1000 ) //GetAsyncKeyState( VK_ESCAPE ) == 0 )
+    while( i < 10000 ) //GetAsyncKeyState( VK_ESCAPE ) == 0 )
     {
         i += 1;
-        Sleep( 10 ); // Perform work i.e game loop code here - let's emulate it with a sleep
+        // Sleep( 10 ); // Perform work i.e game loop code here - let's emulate it with a sleep
 
         // Only enter the next code section if not in reconnecting state
-        if( !InterlockedCompareExchange( &thread_context.is_reconnecting, 0L, 0L ) )
+        if( !InterlockedCompareExchange( &thread_context->is_reconnecting, 0L, 0L ) )
         {
             error = tobii_device_process_callbacks( device );
 
             if( error == TOBII_ERROR_CONNECTION_FAILED )
             {
                 // Change state and signal that reconnect is needed.
-                InterlockedExchange( &thread_context.is_reconnecting, 1L );
-                SetEvent( thread_context.reconnect_event );
+                InterlockedExchange( &thread_context->is_reconnecting, 1L );
+                SetEvent( thread_context->reconnect_event );
             }
             else if( error != TOBII_ERROR_NO_ERROR )
             {
@@ -321,18 +418,18 @@ int collect_gaze( struct thread_context_t* context )
             }
 
             // Use the gaze point data
-            if( latest_gaze_point.validity == TOBII_VALIDITY_VALID )
-                printf( "Gaze point: %" PRIu64 " %f, %f\n", latest_gaze_point.timestamp_us,
-                    latest_gaze_point.position_xy[ 0 ], latest_gaze_point.position_xy[ 1 ] );
-            else
-                printf( "Gaze point: %" PRIu64 " INVALID\n", latest_gaze_point.timestamp_us );
+            // if( data->latest_gaze_point.validity == TOBII_VALIDITY_VALID )
+            //     printf( "Gaze point: %" PRIu64 " %f, %f\n", data->latest_gaze_point.timestamp_us,
+            //         data->latest_gaze_point.position_xy[ 0 ], data->latest_gaze_point.position_xy[ 1 ] );
+            // else
+            //     printf( "Gaze point: %" PRIu64 " INVALID\n", data->latest_gaze_point.timestamp_us );
         }
 
-        Sleep( 6 ); // Perform work which needs eye tracking data and the rest of the game loop
+        // Sleep( 6 ); // Perform work which needs eye tracking data and the rest of the game loop
     }
 
     // Signal reconnect and timesync thread to exit and clean up event objects.
-    SetEvent( thread_context.exit_event );
+    SetEvent( thread_context->exit_event );
     WaitForSingleObject( thread_handle, INFINITE );
     CloseHandle( thread_handle );
     CloseHandle( timesync_event );
@@ -352,5 +449,6 @@ int collect_gaze( struct thread_context_t* context )
         fprintf( stderr, "Failed to destroy API.\n" );
 
     DeleteCriticalSection( &log_mutex );
+    
     return 0;
 }

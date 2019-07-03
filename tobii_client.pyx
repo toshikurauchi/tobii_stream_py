@@ -17,15 +17,15 @@ __version__ = f'{tobii_version.major}.{tobii_version.minor}.{tobii_version.revis
 GazePoint = namedtuple('GazePoint', 'timestamp, valid, x, y')
 
 cdef class TobiiAPI:
-    cdef bint stop_requested
     cdef object thread_handle
+    cdef bint stop_requested
+    cdef bint stopped
     cdef tobii_api_t* p_api
     cdef tobii_device_t* p_device
     cdef c_api_data_t api_data
     cdef thread_context_t gaze_thread_context
 
     def __init__(self):
-        self.stop_requested = False
         self.thread_handle = None
 
         # Tobii API
@@ -34,25 +34,36 @@ cdef class TobiiAPI:
             self.p_device = tobii_client.c_connect_device(self.p_api, &self.api_data)
         else:
             self.p_device = NULL
-        self.gaze_thread_context.stop_requested = False
-        self.gaze_thread_context.stopped = False
+        self.stop_requested = False
+        self.stopped = False
     
     def start_stream(self):
+        retval = subscribe(self.p_api, self.p_device, &self.api_data)
+        if retval != 0:
+            raise RuntimeError('Could not subscribe to device')
+        retval = setup_thread_context(self.p_api, self.p_device, &self.api_data, &self.gaze_thread_context)
+        if retval != 0:
+            raise RuntimeError('Could not setup thread context')
+        retval = start_reconnect_and_timesync_thread(self.p_api, self.p_device, &self.api_data, &self.gaze_thread_context)
+        if retval != 0:
+            raise RuntimeError('Could not create reconnect and timesync thread')
+        retval = schedule_timesync(self.p_api, self.p_device, &self.api_data, &self.gaze_thread_context)
+        if retval != 0:
+            raise RuntimeError('Could not schedule time synchronization event')
         self.thread_handle = threading.Thread(target=self.gaze_loop_thread)
         self.thread_handle.start()
-    
+     
     def stop_stream(self):
         self.stop_requested = True
-        while not self.gaze_thread_context.stopped:
+        while not self.stopped:
             time.sleep(0.1)
     
     def gaze_loop_thread(self):
         while not self.stop_requested:
+            update_data(self.p_device, &self.gaze_thread_context)
             time.sleep(0.1)
-            print('THREAD')
-        self.gaze_thread_context.stop_requested = True
-        self.gaze_thread_context.stopped = True # TODO REMOVE!!! TEST ONLY!!!
-    
+        self.stopped = True
+        
     def __enter__(self):
         self.start_stream()
         return self

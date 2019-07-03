@@ -47,9 +47,8 @@ struct thread_context_t
     HANDLE reconnect_event; // Used to signal that a reconnect is needed
     HANDLE timesync_event; // Timer event used to signal that time synchronization is needed
     HANDLE exit_event; // Used to signal that the background thead should exit
+    HANDLE reconnect_and_timesync_thread_handle;
     volatile LONG is_reconnecting;
-    int stop_requested;
-    int stopped;
 };
 
 static DWORD WINAPI reconnect_and_timesync_thread( LPVOID param );
@@ -60,4 +59,14 @@ tobii_api_t* c_init_api( struct c_api_data_t* api_data );
 
 tobii_device_t* c_connect_device( tobii_api_t* api, struct c_api_data_t* api_data );
 
-int collect_gaze( struct thread_context_t* context );
+int subscribe( tobii_api_t* api, tobii_device_t* device, struct c_api_data_t* data );
+
+int setup_thread_context( tobii_api_t* api, tobii_device_t* device, struct c_api_data_t* data, struct thread_context_t* thread_context );
+
+int start_reconnect_and_timesync_thread( tobii_api_t* api, tobii_device_t* device, struct c_api_data_t* data, struct thread_context_t* thread_context );
+
+int schedule_timesync( tobii_api_t* api, tobii_device_t* device, struct c_api_data_t* data, struct thread_context_t* thread_context );
+
+int update_data( tobii_device_t* device, struct thread_context_t* thread_context );
+
+int collect_gaze( struct c_api_data_t* data, struct thread_context_t* context );
