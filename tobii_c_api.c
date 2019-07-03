@@ -183,7 +183,7 @@ tobii_device_t* c_connect_device(tobii_api_t* api, struct c_api_data_t* api_data
     return device;
 }
 
-int subscribe( tobii_api_t* api, tobii_device_t* device, struct c_api_data_t* data )
+int c_subscribe( tobii_api_t* api, tobii_device_t* device, struct c_api_data_t* data )
 {
     // Start subscribing to gaze point data, in this sample we supply a tobii_gaze_point_t variable to store latest value.
     tobii_error_t error = tobii_gaze_point_subscribe( device, data->gaze_callback, &data->latest_gaze_point );
@@ -199,7 +199,7 @@ int subscribe( tobii_api_t* api, tobii_device_t* device, struct c_api_data_t* da
     return 0;
 }
 
-int setup_thread_context( tobii_api_t* api, tobii_device_t* device, struct c_api_data_t* data, struct thread_context_t* thread_context )
+int c_setup_thread_context( tobii_api_t* api, tobii_device_t* device, struct c_api_data_t* data, struct thread_context_t* thread_context )
 {
     // Create event objects used for inter thread signaling
     HANDLE reconnect_event = CreateEvent( NULL, FALSE, FALSE, NULL );
@@ -223,7 +223,7 @@ int setup_thread_context( tobii_api_t* api, tobii_device_t* device, struct c_api
     return 0;
 }
 
-int start_reconnect_and_timesync_thread( tobii_api_t* api, tobii_device_t* device, struct c_api_data_t* data, struct thread_context_t* thread_context )
+int c_start_reconnect_and_timesync_thread( tobii_api_t* api, tobii_device_t* device, struct c_api_data_t* data, struct thread_context_t* thread_context )
 {
     // Create and run the reconnect and timesync thread
     thread_context->reconnect_and_timesync_thread_handle = CreateThread( NULL, 0U, reconnect_and_timesync_thread, &thread_context, 0U, NULL );
@@ -239,7 +239,7 @@ int start_reconnect_and_timesync_thread( tobii_api_t* api, tobii_device_t* devic
     return 0;
 }
 
-int schedule_timesync( tobii_api_t* api, tobii_device_t* device, struct c_api_data_t* data, struct thread_context_t* thread_context )
+int c_schedule_timesync( tobii_api_t* api, tobii_device_t* device, struct c_api_data_t* data, struct thread_context_t* thread_context )
 {
     LARGE_INTEGER due_time;
     LONGLONG const timesync_update_interval = 300000000LL; // time sync every 30 s
@@ -258,7 +258,7 @@ int schedule_timesync( tobii_api_t* api, tobii_device_t* device, struct c_api_da
     return 0;
 }
 
-int update_data( tobii_device_t* device, struct thread_context_t* thread_context )
+int c_update_data( tobii_device_t* device, struct thread_context_t* thread_context )
 {
     if( InterlockedCompareExchange( &thread_context->is_reconnecting, 0L, 0L ) )
     {
@@ -281,7 +281,7 @@ int update_data( tobii_device_t* device, struct thread_context_t* thread_context
     return 0;
 }
 
-void cleanup( tobii_api_t* api, tobii_device_t* device, struct c_api_data_t* data, struct thread_context_t* thread_context )
+void c_cleanup( tobii_api_t* api, tobii_device_t* device, struct c_api_data_t* data, struct thread_context_t* thread_context )
 {
     // Signal reconnect and timesync thread to exit and clean up event objects.
     SetEvent( thread_context->exit_event );

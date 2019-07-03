@@ -68,16 +68,16 @@ cdef class TobiiAPI:
         self.stopped = False
     
     def start_stream(self):
-        retval = subscribe(self.p_api, self.p_device, &self.api_data)
+        retval = c_subscribe(self.p_api, self.p_device, &self.api_data)
         if retval != 0:
             raise RuntimeError('Could not subscribe to device')
-        retval = setup_thread_context(self.p_api, self.p_device, &self.api_data, &self.gaze_thread_context)
+        retval = c_setup_thread_context(self.p_api, self.p_device, &self.api_data, &self.gaze_thread_context)
         if retval != 0:
             raise RuntimeError('Could not setup thread context')
-        retval = start_reconnect_and_timesync_thread(self.p_api, self.p_device, &self.api_data, &self.gaze_thread_context)
+        retval = c_start_reconnect_and_timesync_thread(self.p_api, self.p_device, &self.api_data, &self.gaze_thread_context)
         if retval != 0:
             raise RuntimeError('Could not create reconnect and timesync thread')
-        retval = schedule_timesync(self.p_api, self.p_device, &self.api_data, &self.gaze_thread_context)
+        retval = c_schedule_timesync(self.p_api, self.p_device, &self.api_data, &self.gaze_thread_context)
         if retval != 0:
             raise RuntimeError('Could not schedule time synchronization event')
         self.thread_handle = threading.Thread(target=self.gaze_loop_thread)
@@ -87,11 +87,11 @@ cdef class TobiiAPI:
         self.stop_requested = True
         while not self.stopped:
             time.sleep(0.1)
-        cleanup(self.p_api, self.p_device, &self.api_data, &self.gaze_thread_context)
+        c_cleanup(self.p_api, self.p_device, &self.api_data, &self.gaze_thread_context)
     
     def gaze_loop_thread(self):
         while not self.stop_requested:
-            update_data(self.p_device, &self.gaze_thread_context)
+            c_update_data(self.p_device, &self.gaze_thread_context)
             time.sleep(0.1)
         self.stopped = True
         

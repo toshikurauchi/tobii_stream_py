@@ -78,9 +78,9 @@ cdef extern from "tobii_c_api.h":
     char* select_device(device_list_t* devices);
     tobii_api_t* c_init_api(c_api_data_t* api_data);
     tobii_device_t* c_connect_device(tobii_api_t* api, c_api_data_t* api_data);
-    int subscribe(tobii_api_t* api, tobii_device_t* device, c_api_data_t* data);
-    int setup_thread_context(tobii_api_t* api, tobii_device_t* device, c_api_data_t* data, thread_context_t* thread_context);
-    int start_reconnect_and_timesync_thread(tobii_api_t* api, tobii_device_t* device, c_api_data_t* data, thread_context_t* thread_context);
-    int schedule_timesync(tobii_api_t* api, tobii_device_t* device, c_api_data_t* data, thread_context_t* thread_context);
-    int update_data( tobii_device_t* device, thread_context_t* thread_context );
-    void cleanup(tobii_api_t* api, tobii_device_t* device, c_api_data_t* data, thread_context_t* thread_context);
+    int c_subscribe(tobii_api_t* api, tobii_device_t* device, c_api_data_t* data);
+    int c_setup_thread_context(tobii_api_t* api, tobii_device_t* device, c_api_data_t* data, thread_context_t* thread_context);
+    int c_start_reconnect_and_timesync_thread(tobii_api_t* api, tobii_device_t* device, c_api_data_t* data, thread_context_t* thread_context);
+    int c_schedule_timesync(tobii_api_t* api, tobii_device_t* device, c_api_data_t* data, thread_context_t* thread_context);
+    int c_update_data( tobii_device_t* device, thread_context_t* thread_context );
+    void c_cleanup(tobii_api_t* api, tobii_device_t* device, c_api_data_t* data, thread_context_t* thread_context);

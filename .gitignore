@@ -2,4 +2,5 @@ tobii_stream_engine.lib
 tobii_stream_engine.dll
 include/tobii
 tobii_client.*pyd
+tobii_client.c
 build
