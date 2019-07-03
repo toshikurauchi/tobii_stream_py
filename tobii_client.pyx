@@ -8,6 +8,10 @@ import threading
 import time
 
 
+# Globals :(
+cdef TobiiAPI __api_instance = None
+
+
 # Load Tobii API version
 cdef tobii_client.tobii_version_t tobii_version
 tobii_client.tobii_get_api_version(&tobii_version)
@@ -17,8 +21,28 @@ __version__ = f'{tobii_version.major}.{tobii_version.minor}.{tobii_version.revis
 GazePoint = namedtuple('GazePoint', 'timestamp, valid, x, y')
 
 
+cdef void __api_gaze_callback(tobii_gaze_point_t* gaze_point, void* user_data):
+    cdef tobii_gaze_point_t* latest
+    # Get values
+    timestamp = gaze_point.timestamp_us
+    valid = gaze_point.validity == tobii_client.TOBII_VALIDITY_VALID
+    x = gaze_point.position_xy[0]
+    y = gaze_point.position_xy[1]
+    
+    # Store values
+    latest = <tobii_gaze_point_t*>user_data
+    latest.timestamp_us = timestamp
+    latest.validity = gaze_point.validity
+    latest.position_xy[0] = x
+    latest.position_xy[1] = y
+
+    if __api_instance and __api_instance.user_gaze_callback:
+        __api_instance.user_gaze_callback(GazePoint(timestamp, valid, x, y))
+
+
 cdef class TobiiAPI:
     cdef object thread_handle
+    cdef object user_gaze_callback
     cdef bint stop_requested
     cdef bint stopped
     cdef tobii_api_t* p_api
@@ -26,8 +50,12 @@ cdef class TobiiAPI:
     cdef c_api_data_t api_data
     cdef thread_context_t gaze_thread_context
 
-    def __init__(self):
+    def __init__(self, gaze_callback=None):
+        global __api_instance
+        
+        __api_instance = self
         self.thread_handle = None
+        self.user_gaze_callback = gaze_callback
 
         # Tobii API
         self.p_api = tobii_client.c_init_api(&self.api_data)
@@ -35,19 +63,9 @@ cdef class TobiiAPI:
             self.p_device = tobii_client.c_connect_device(self.p_api, &self.api_data)
         else:
             self.p_device = NULL
-        self.api_data.gaze_callback = &self.gaze_callback
+        self.api_data.gaze_callback = &__api_gaze_callback
         self.stop_requested = False
         self.stopped = False
-    
-    cdef void gaze_callback(tobii_gaze_point_t* gaze_point, void* user_data):
-        # Store the latest gaze point data in the supplied storage
-        cdef tobii_gaze_point_t* ud
-        ud = <tobii_gaze_point_t*>user_data
-        ud.timestamp_us = gaze_point.timestamp_us
-        ud.validity = gaze_point.validity
-        ud.position_xy[0] = gaze_point.position_xy[0]
-        ud.position_xy[1] = gaze_point.position_xy[1]
-        print(gaze_point.position_xy[0], gaze_point.position_xy[1])
     
     def start_stream(self):
         retval = subscribe(self.p_api, self.p_device, &self.api_data)

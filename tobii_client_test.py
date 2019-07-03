@@ -1,8 +1,11 @@
 import time
 import tobii_client as tobii
 
-print(tobii.__version__)
-with tobii.TobiiAPI() as api:
-    for i in range(10):
-        time.sleep(0.2)
+print(f'Version: {tobii.__version__}')
+
+def gaze_callback(gaze_point):
+    print(f'Gaze Point:\n  Timestamp: {gaze_point.timestamp}\n  Valid: {gaze_point.valid}\n  Position: ({gaze_point.x}, {gaze_point.y})\n')
+
+with tobii.TobiiAPI(gaze_callback) as api:
+    time.sleep(1)
         
