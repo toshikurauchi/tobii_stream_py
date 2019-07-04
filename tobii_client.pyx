@@ -50,7 +50,7 @@ cdef class TobiiAPI:
     cdef c_api_data_t api_data
     cdef thread_context_t gaze_thread_context
 
-    def __init__(self, gaze_callback=None):
+    def __init__(self, gaze_callback):
         global __api_instance
         
         __api_instance = self

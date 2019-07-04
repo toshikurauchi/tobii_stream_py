@@ -8,4 +8,11 @@ def gaze_callback(gaze_point):
 
 with tobii.TobiiAPI(gaze_callback) as api:
     time.sleep(1)
-        
+
+'''
+# Same as
+api = tobii.TobiiAPI(gaze_callback)
+api.start_stream()
+time.sleep(1)
+api.stop_stream()
+'''
