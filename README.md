@@ -10,7 +10,7 @@ Simple wrapper for Tobii Stream API (**Windows Only**).
 
 1. Clone this project
 1. Install [Tobii Eye Tracking Core Software](https://gaming.tobii.com/getstarted/?bundle=tobii-core)
-1. Download [Stream Engine 3.3.0 for Windows x86](https://developer.tobii.com/download-packages/stream-engine-3-3-0-for-windows-x86/?wpdmdl=11556&refresh=5d1e3887c2a1b1562261639) (it must be x86 even if you are using a 64-bit Windows because Python needs the 32-bit library)
+1. Download [Stream Engine 3.3.0 for Windows x86](https://developer.tobii.com/download-packages/stream-engine-3-3-0-for-windows-x86/?wpdmdl=11556&refresh=5d1e3887c2a1b1562261639) (it must be x86 even if you are using a 64-bit Windows because Python needs the 32-bit library), or the latest version available [here](https://developer.tobii.com/consumer-eye-trackers/stream-engine/getting-started/)
 1. Extract the files
 1. Move `tobii_stream_engine.dll` and `tobii_stream_engine.lib` from `lib/tobii` to this project's root directory
 1. Move `tobii` directory from `include` to this project's `include` directory
