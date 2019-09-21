@@ -11,5 +11,6 @@ setup(
             libraries=['tobii_stream_engine'],
         )
     ], language_level=3),
-    data_files=[('', ['tobii_stream_engine.dll', 'tobii_stream_engine.lib'])]
+    data_files=[('', ['tobii_stream_engine.dll', 'tobii_stream_engine.lib'])],
+    py_modules = ['windows_window'],
 )

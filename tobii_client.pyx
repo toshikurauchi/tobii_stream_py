@@ -6,6 +6,7 @@ cimport tobii_client
 from collections import namedtuple
 import threading
 import time
+from windows_window import init_window, map_to_window
 
 
 # Globals :(
@@ -18,7 +19,42 @@ tobii_client.tobii_get_api_version(&tobii_version)
 __version__ = f'{tobii_version.major}.{tobii_version.minor}.{tobii_version.revision}.{tobii_version.build}'
 
 
-GazePoint = namedtuple('GazePoint', 'timestamp, valid, x, y')
+class GazePoint:
+    def __init__(self, timestamp, valid, x, y):
+        self.timestamp = timestamp
+        self.valid = valid
+        self._x = x
+        self._y = y
+        self._mapped = None
+    
+    @property
+    def raw_x(self):
+        return self._x
+    
+    @property
+    def raw_y(self):
+        return self._y
+    
+    @property
+    def x(self):
+        if self.pos:
+            return self.pos[0]
+        return None
+    
+    @property
+    def y(self):
+        if self.pos:
+            return self.pos[1]
+        return None
+    
+    @property
+    def pos(self):
+        if self._mapped is None:
+            try:
+                self._mapped = map_to_window(self._x, self._y)
+            except:
+                pass
+        return self._mapped
 
 
 cdef void __api_gaze_callback(tobii_gaze_point_t* gaze_point, void* user_data):
